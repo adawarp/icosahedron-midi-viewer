@@ -9,7 +9,8 @@
   },
   "lint-staged": {
     "./js/**/*.js": [
-      "prettier --write --config ./.prettierrc.js"
+      "prettier --write --config ./.prettierrc.js",
+      "eslint --config ./.eslintrc.js"
     ]
   },
   "husky": {
@@ -28,6 +29,9 @@
   },
   "homepage": "https://github.com/adawarp/icosahedron-midi-viewer#readme",
   "devDependencies": {
+    "eslint": "^7.27.0",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-prettier": "^3.4.0",
     "husky": "^6.0.0",
     "lint-staged": "11.0.0",
     "prettier": "2.3.0"

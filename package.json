@@ -1,0 +1,35 @@
+{
+  "name": "icosahedron-midi-viewer",
+  "version": "1.0.0",
+  "description": "## What is Icosahedron MIDI Viewer ?",
+  "main": "index.js",
+  "scripts": {
+    "prepare": "husky install",
+    "fix": "lint-staged"
+  },
+  "lint-staged": {
+    "./js/**/*.js": [
+      "prettier --write --config ./.prettierrc.js"
+    ]
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "fix"
+    }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/adawarp/icosahedron-midi-viewer.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/adawarp/icosahedron-midi-viewer/issues"
+  },
+  "homepage": "https://github.com/adawarp/icosahedron-midi-viewer#readme",
+  "devDependencies": {
+    "husky": "^6.0.0",
+    "lint-staged": "11.0.0",
+    "prettier": "2.3.0"
+  }
+}

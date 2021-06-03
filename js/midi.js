@@ -1,7 +1,7 @@
 let midi = null;
 let inputs = [];
 let outputs = [];
-keyboard = [];
+let keyboard = [];
 for (let i = 0; i < 128; i++) {
   keyboard.push({ event: 128, velocity: 64 });
 }

@@ -4,12 +4,46 @@
     <title>Icosahedron MIDI Viewer</title>
     <script src="./js/distribution.js"></script>
     <script src="./js/midi.js"></script>
-    <script src="./js/three.js"></script>
+    <script src="./js/scene.js"></script>
     <script type="text/javascript" src="./js/main.js"></script>
     <script src="./js/three.min.js"></script>
   </head>
   <body>
     <h1>Icosahedron MIDI Viewer</h1>
     <canvas id="myCanvas"></canvas>
+    <p>Musical Icosahedron by Imai, Dellby, and Tanaka</p>
+    <div>
+      <form id="golden">
+        <label>
+          <input type="radio" name="golden" value="triangle">golden triangle
+        </label>
+        <label>
+          <input type="radio" name="golden" value="gnomon">golden gnomon（未実装）
+        </label>
+        <label>
+          <input type="radio" name="golden" value="mix">mix（未実装）
+        </label>
+      </form>
+    </div>
+    <div>
+      <form id="type">
+        <label>
+          <input type="radio" name="type" value="1">type 1
+        </label>
+        <label>
+          <input type="radio" name="type" value="2">type 2
+        </label>
+        <label>
+          <input type="radio" name="type" value="3">type 3
+        </label>
+        <label>
+          <input type="radio" name="type" value="4">type 4
+        </label>
+      </form>
+    </div>
+    <p><a href="https://arxiv.org/abs/2103.10272">https://arxiv.org/abs/2103.10272</a></p>
+    <p><a href="https://note.com/imaiyusuke1993">https://note.com/imaiyusuke1993</a></p>
   </body>
-</html>
+  <script src="./js/arrangement.js"></script>
+  </html>
+  

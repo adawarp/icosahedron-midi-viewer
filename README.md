@@ -9,7 +9,9 @@
 https://adawarp.github.io/icosahedron-midi-viewer/
 
 ## How to play ?
-- 使用方法をここに明記します
+- MIDIキーボードをコンピュータに接続してから、ページを立ち上げてください。
+- 自動的にキーボードを読み取るので、演奏するとリアルタイムで図形が光ります。
+- ラジオボタンから、頂点に音を割り当てる方法を選んでください。
 
 ## For Developer
 

@@ -26,6 +26,8 @@ function successCallback(m) {
     outputs.push(output.value);
   }
 
+  // outputs[0].send([144, 64, 100], performance.now()+1000)
+
   for (let cnt = 0; cnt < inputs.length; cnt++) {
     inputs[cnt].onmidimessage = onMIDIEvent;
   }

@@ -16,7 +16,7 @@ function three() {
     new THREE.BoxGeometry(2000, 0.1, 2000),
     new THREE.MeshStandardMaterial({ color: 0x808080, roughness: 0.0 })
   );
-  meshFloor.position.set(0, -18, 0);
+  meshFloor.position.set(0, -24, 0);
   scene.add(meshFloor);
 
   const light = new THREE.PointLight(0xffffff, 1, 50, 1);
@@ -24,19 +24,24 @@ function three() {
   scene.add(light);
 
   const vertexIcosahedron = [
-    [0, 1, 1.618],
-    [0, -1, 1.618],
-    [0, 1, -1.618],
-    [0, -1, -1.618],
-    [1.618, 0, 1],
-    [1.618, 0, -1],
-    [-1.618, 0, 1],
-    [-1.618, 0, -1],
-    [1, 1.618, 0],
-    [-1, 1.618, 0],
-    [1, -1.618, 0],
-    [-1, -1.618, 0],
+    [0, 1.618, 1],
+    [0, 1.618, -1],
+    [1.618, 1, 0],
+    [1, 0, 1.618],
+    [-1, 0, 1.618],
+    [-1.618, 1, 0],
+    [1.618, -1, 0],
+    [1, 0, -1.618],
+    [-1, 0, -1.618],
+    [-1.618, -1, 0],
+    [0, -1.618, 1],
+    [0, -1.618, -1],
   ];
+
+  let arrangedVertex = [];
+  for (let i = 0; i < 12; i++) {
+    arrangedVertex.push(vertexIcosahedron[arrangement[i]]);
+  }
 
   const vertexGroup = new THREE.Group();
   for (let i = 0; i < 12; i++) {
@@ -44,9 +49,9 @@ function three() {
     const material = new THREE.MeshBasicMaterial({ color: 0x000000 });
     const sphere = new THREE.Mesh(geometry, material);
     sphere.position.set(
-      vertexIcosahedron[i][0] * 10,
-      vertexIcosahedron[i][1] * 10,
-      vertexIcosahedron[i][2] * 10
+      arrangedVertex[i][0] * 10,
+      arrangedVertex[i][1] * 10,
+      arrangedVertex[i][2] * 10
     );
     vertexGroup.add(sphere);
   }
@@ -58,14 +63,14 @@ function three() {
       const material = new THREE.LineBasicMaterial({ color: 0x0000ff });
       const points = [
         new THREE.Vector3(
-          vertexIcosahedron[i][0] * 10,
-          vertexIcosahedron[i][1] * 10,
-          vertexIcosahedron[i][2] * 10
+          arrangedVertex[i][0] * 10,
+          arrangedVertex[i][1] * 10,
+          arrangedVertex[i][2] * 10
         ),
         new THREE.Vector3(
-          vertexIcosahedron[j][0] * 10,
-          vertexIcosahedron[j][1] * 10,
-          vertexIcosahedron[j][2] * 10
+          arrangedVertex[j][0] * 10,
+          arrangedVertex[j][1] * 10,
+          arrangedVertex[j][2] * 10
         ),
       ];
       const geometry = new THREE.BufferGeometry().setFromPoints(points);

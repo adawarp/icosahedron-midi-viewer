@@ -1,5 +1,7 @@
 const main = () => {
-  console.warn('hello main.js');
+  window.addEventListener('load', three);
+  navigator.requestMIDIAccess().then(successCallback, faildCallback);
+  three();
 };
 
 document.addEventListener('DOMContentLoaded', () => {

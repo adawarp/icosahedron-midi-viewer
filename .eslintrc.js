@@ -19,6 +19,7 @@ module.exports = {
     "plugin:prettier/recommended",
     "prettier"
   ],
+  "ignorePatterns": ["three.min.js"],
   "rules": {
     "no-console": ["error", { allow: ["warn"] }],
     "semi": [2, "always"],

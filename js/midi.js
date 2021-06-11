@@ -8,6 +8,7 @@ let startTime = Date.now();
 for (let i = 0; i < 128; i++) {
   keyboard.push({ event: 128, velocity: 64 });
 }
+keyboard.push({ event: 176, velocity: 0 });
 
 function successCallback(m) {
   midi = m;
@@ -69,8 +70,12 @@ function successCallback(m) {
     inputs[cnt].onmidimessage = onMIDIEvent;
   }
   function onMIDIEvent(e) {
-    keyboard[e.data[1]].event = e.data[0];
-    keyboard[e.data[1]].velocity = e.data[2];
+    if (e.data[0] === 128 || e.data[0] === 144) {
+      keyboard[e.data[1]].event = e.data[0];
+      keyboard[e.data[1]].velocity = e.data[2];
+    } else if (e.data[0] === 176) {
+      keyboard[128].velocity = e.data[2];
+    }
     midiHistory.push([Date.now(), e.data]);
   }
 }

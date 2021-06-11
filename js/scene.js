@@ -111,7 +111,7 @@ function three() {
     for (let i = 0; i < 66; i++)
       if (distributionLine(keys).includes(i)) {
         lineGroup.children[i].material.color = { r: 1, g: 1, b: 1 };
-      } else {
+      } else if (keyboard[128].velocity === 0) {
         lineGroup.children[i].material.color = { r: 0, g: 0, b: 0 };
       }
   }

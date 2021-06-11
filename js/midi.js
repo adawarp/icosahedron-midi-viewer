@@ -60,6 +60,9 @@ function successCallback(m) {
       }
       outputs[0].send(note, performance.now() + midiHistory[i][0] - startTime);
       setTimeout(() => {
+        if (note[0] === 176) {
+          keyboard[128].velocity = note[2];
+        }
         keyboard[note[1]].event = midiHistory[i][1][0];
         keyboard[note[1]].velocity = midiHistory[i][1][2];
       }, midiHistory[i][0] - startTime);

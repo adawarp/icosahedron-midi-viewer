@@ -80,6 +80,27 @@ function three() {
   }
   scene.add(lineGroup);
 
+  //文字出力のためのテストだが、現状CORS policyに弾かれる
+  // const loader = new THREE.FontLoader();
+  // loader.load( 'fonts/helvetiker_regular.typeface.json', function ( font ) {
+
+  //   const geometry = new THREE.TextGeometry( 'Hello three.js!', {
+  //     font: font,
+  //     size: 80,
+  //     height: 5,
+  //     curveSegments: 12,
+  //     bevelEnabled: true,
+  //     bevelThickness: 10,
+  //     bevelSize: 8,
+  //     bevelOffset: 0,
+  //     bevelSegments: 5
+  //   });
+  //   const material = new THREE.MeshBasicMaterial({ color: 0xffffff });
+  //   const mesh = new THREE.mesh(geometry, material)
+  //   mesh.position.set(0,0,0)
+  //   scene.add(mesh)
+  // });
+
   function brightVertex(keys) {
     for (let i = 0; i < 128; i++) {
       vertexGroup.children[i % 12].material.color = distribution(keys, i % 12);

@@ -19,9 +19,28 @@ function three() {
   meshFloor.position.set(0, -24, 0);
   scene.add(meshFloor);
 
-  const light = new THREE.PointLight(0xffffff, 1, 50, 1);
-  light.position.set(0, 0, 0);
-  scene.add(light);
+  const light1 = new THREE.PointLight(0xffffff, 1, 50, 1);
+  const light2 = new THREE.PointLight(0xffffff, 1, 50, 1);
+  const light3 = new THREE.PointLight(0xffffff, 1, 50, 1);
+  light1.position.set(0, 40, 0);
+  light2.position.set(40, 0, 0);
+  light3.position.set(0, 0, 40);
+  scene.add(light1);
+  scene.add(light2);
+  scene.add(light3);
+
+  const icosahedronGeometry = new THREE.IcosahedronGeometry(19);
+  const icosahedronMaterial = new THREE.MeshLambertMaterial({
+    opacity: 0.5,
+    transparent: true,
+  });
+  const icosahedronMesh = new THREE.Mesh(
+    icosahedronGeometry,
+    icosahedronMaterial
+  );
+  icosahedronMesh.rotation.set(Math.PI / 2, 0, 0);
+  icosahedronMesh.position.set(0, 0, 0);
+  scene.add(icosahedronMesh);
 
   const vertexIcosahedron = [
     [0, 1.618, 1],
@@ -45,7 +64,7 @@ function three() {
 
   const vertexGroup = new THREE.Group();
   for (let i = 0; i < 12; i++) {
-    const geometry = new THREE.SphereGeometry(1, 32, 32);
+    const geometry = new THREE.SphereGeometry(0.6, 32, 32);
     const material = new THREE.MeshBasicMaterial({ color: 0x000000 });
     const sphere = new THREE.Mesh(geometry, material);
     sphere.position.set(
@@ -55,12 +74,17 @@ function three() {
     );
     vertexGroup.add(sphere);
   }
+  vertexGroup.add(icosahedronMesh);
   scene.add(vertexGroup);
 
   const lineGroup = new THREE.Group();
   for (let i = 0; i < 12; i++) {
     for (let j = i + 1; j < 12; j++) {
-      const material = new THREE.LineBasicMaterial({ color: 0x0000ff });
+      const material = new THREE.LineBasicMaterial({
+        color: 0xffffff,
+        opacity: 1,
+        transparent: true,
+      });
       const points = [
         new THREE.Vector3(
           arrangedVertex[i][0] * 10,
@@ -110,9 +134,11 @@ function three() {
   function brightLine(keys) {
     for (let i = 0; i < 66; i++)
       if (distributionLine(keys).includes(i)) {
-        lineGroup.children[i].material.color = { r: 1, g: 1, b: 1 };
+        lineGroup.children[i].material.opacity = 1;
+        lineGroup.children[i].material.transparent = false;
       } else if (keyboard[128].velocity === 0) {
-        lineGroup.children[i].material.color = { r: 0, g: 0, b: 0 };
+        lineGroup.children[i].material.opacity = 0;
+        lineGroup.children[i].material.transparent = true;
       }
   }
 

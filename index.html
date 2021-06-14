@@ -10,10 +10,20 @@
   </head>
   <body>
     <h1>Icosahedron MIDI Viewer</h1>
+    <p id="midiInput">midi入力</p>
+    <p id="midiOutput">midi出力</p>
     <canvas id="myCanvas"></canvas>
     <div>
-      <button id="recordButton">●</button>
-      <button id="playButton">▷</button>
+      <p id="status"></p>
+    </div>
+    <div>
+      <button id="recordButton">録音</button>
+      <button id="recordStopButton">録音停止</button>
+      <button id="playGeometryButton">図形を保持して再生</button>
+      <button id="playMusicButton">音楽を保持して再生</button>
+      <button id="playRepeatButton">図形を保持して連続再生</button>
+      <button id="playStopButton">再生停止</button>
+
     </div>
     <div>
       <form id="golden">

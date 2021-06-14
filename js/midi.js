@@ -20,6 +20,8 @@ function successCallback(m) {
   ) {
     inputs.push(input.value);
   }
+  document.getElementById('midiInput').textContent =
+    'midi入力 : ' + inputs[0].name;
 
   let outputIterator = midi.outputs.values();
   for (
@@ -29,6 +31,8 @@ function successCallback(m) {
   ) {
     outputs.push(output.value);
   }
+  document.getElementById('midiOutput').textContent =
+    'midi出力 : ' + outputs[0].name;
 
   const recordButton = document.getElementById('recordButton');
   recordButton.addEventListener('click', () => {
@@ -37,8 +41,8 @@ function successCallback(m) {
     startTime = Date.now();
   });
 
-  const playButton = document.getElementById('playButton');
-  playButton.addEventListener('click', () => {
+  const playGeometryButton = document.getElementById('playGeometryButton');
+  playGeometryButton.addEventListener('click', () => {
     function transpose(key) {
       const octave = Math.floor(key / 12);
       const noteName = key % 12;

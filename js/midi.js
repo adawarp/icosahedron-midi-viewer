@@ -6,10 +6,16 @@ let midiHistory = [];
 let recordArrangement = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 let startTime = Date.now();
 let toggleRecording = false;
-for (let i = 0; i < 128; i++) {
-  keyboard.push({ event: 128, velocity: 64 });
+let playTimeoutIDList = [];
+function initializeKeyboard() {
+  keyboard = [];
+  for (let i = 0; i < 128; i++) {
+    keyboard.push({ event: 128, velocity: 64 });
+  }
+  keyboard.push({ event: 176, velocity: 0 });
 }
-keyboard.push({ event: 176, velocity: 0 });
+initializeKeyboard();
+
 function successCallback(m) {
   midi = m;
   let inputIterator = midi.inputs.values();
@@ -33,27 +39,48 @@ function successCallback(m) {
   }
   document.getElementById('midiOutput').textContent =
     'midi出力 : ' + outputs[0].name;
+
+  function allNoteOff() {
+    for (let i = 0; i < 128; i++) {
+      outputs[0].send([144, i, 0], performance.now());
+    }
+    outputs[0].send([176, 64, 0], performance.now());
+    outputs[0].send([177, 64, 0], performance.now());
+  }
   const recordStatus = document.getElementById('recordStatus');
 
   const recordButton = document.getElementById('recordButton');
+  const recordStopButton = document.getElementById('recordStopButton');
+  const playGeometryButton = document.getElementById('playGeometryButton');
+  const playMusicButton = document.getElementById('playMusicButton');
+  const playStopButton = document.getElementById('playStopButton');
+
   recordButton.addEventListener('click', () => {
     recordStatus.textContent = '録音中';
+    recordStopButton.disabled = false;
     toggleRecording = true;
     recordArrangement = arrangement;
     midiHistory = [];
     startTime = Date.now();
   });
 
-  const recordStopButton = document.getElementById('recordStopButton');
   recordStopButton.addEventListener('click', () => {
-    recordStatus.textContent = '';
+    playGeometryButton.disabled = false;
+    playMusicButton.disabled = false;
+    recordStopButton.disabled = true;
     toggleRecording = false;
     midiHistory.push([Date.now(), [0, 0, 0]]);
+    recordStatus.textContent =
+      (midiHistory[midiHistory.length - 1][0] - startTime) / 1000 + '秒録音済';
   });
 
-  const playGeometryButton = document.getElementById('playGeometryButton');
   playGeometryButton.addEventListener('click', () => {
     recordStatus.textContent = '図形を保持して再生中';
+    recordButton.disabled = true;
+    recordStopButton.disabled = true;
+    playGeometryButton.disabled = true;
+    playMusicButton.disabled = true;
+    playStopButton.disabled = false;
     function transpose(key) {
       const octave = Math.floor(key / 12);
       const noteName = key % 12;
@@ -73,24 +100,81 @@ function successCallback(m) {
           midiHistory[i][1][2],
         ];
       }
-      if (note[0] !== 0) {
-        outputs[0].send(
-          note,
-          performance.now() + midiHistory[i][0] - startTime
-        );
-      }
-      setTimeout(() => {
-        if (note[0] === 0) {
-          recordStatus.textContent = '---';
-        } else {
-          if (note[0] === 176) {
-            keyboard[128].velocity = note[2];
+      playTimeoutIDList.push(
+        setTimeout(() => {
+          if (note[0] === 0) {
+            recordStatus.textContent =
+              (midiHistory[midiHistory.length - 1][0] - startTime) / 1000 +
+              '秒録音済';
+            recordButton.disabled = false;
+            recordStopButton.disabled = true;
+            playGeometryButton.disabled = false;
+            playMusicButton.disabled = false;
+            playStopButton.disabled = true;
+            playTimeoutIDList = [];
+          } else {
+            outputs[0].send(note, performance.now());
+            if (note[0] === 176) {
+              keyboard[128].velocity = note[2];
+            }
+            keyboard[note[1]].event = midiHistory[i][1][0];
+            keyboard[note[1]].velocity = midiHistory[i][1][2];
           }
-          keyboard[note[1]].event = midiHistory[i][1][0];
-          keyboard[note[1]].velocity = midiHistory[i][1][2];
-        }
-      }, midiHistory[i][0] - startTime);
+        }, midiHistory[i][0] - startTime)
+      );
     }
+  });
+
+  playMusicButton.addEventListener('click', () => {
+    recordStatus.textContent = '音楽を保持して再生中';
+    recordButton.disabled = true;
+    recordStopButton.disabled = true;
+    playGeometryButton.disabled = true;
+    playMusicButton.disabled = true;
+    playStopButton.disabled = false;
+    for (let i = 0; i < midiHistory.length; i++) {
+      let note = [
+        midiHistory[i][1][0],
+        midiHistory[i][1][1],
+        midiHistory[i][1][2],
+      ];
+      playTimeoutIDList.push(
+        setTimeout(() => {
+          if (note[0] === 0) {
+            recordStatus.textContent =
+              (midiHistory[midiHistory.length - 1][0] - startTime) / 1000 +
+              '秒録音済';
+            recordButton.disabled = false;
+            recordStopButton.disabled = true;
+            playGeometryButton.disabled = false;
+            playMusicButton.disabled = false;
+            playStopButton.disabled = true;
+            playTimeoutIDList = [];
+          } else {
+            outputs[0].send(note, performance.now());
+            if (note[0] === 176) {
+              keyboard[128].velocity = note[2];
+            }
+            keyboard[note[1]].event = midiHistory[i][1][0];
+            keyboard[note[1]].velocity = midiHistory[i][1][2];
+          }
+        }, midiHistory[i][0] - startTime)
+      );
+    }
+  });
+
+  playStopButton.addEventListener('click', () => {
+    recordStatus.textContent =
+      (midiHistory[midiHistory.length - 1][0] - startTime) / 1000 + '秒録音済';
+    recordButton.disabled = false;
+    recordStopButton.disabled = true;
+    playGeometryButton.disabled = false;
+    playMusicButton.disabled = false;
+    playStopButton.disabled = true;
+    playTimeoutIDList.forEach((id) => clearTimeout(id));
+    playTimeoutIDList = [];
+    initializeKeyboard();
+    allNoteOff();
   });
 
   for (let cnt = 0; cnt < inputs.length; cnt++) {

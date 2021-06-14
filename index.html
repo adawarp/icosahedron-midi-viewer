@@ -14,21 +14,28 @@
     <p id="midiOutput">midi出力</p>
     <canvas id="myCanvas"></canvas>
     <div>
-      <p id="recordStatus"></p>
+      <p>前後を軸にして回転
+        <input type="range" id="rotationSpeedX" min="-0.02" max="0.02" step="0.001" value="0.005">
+        高低を軸にして回転
+        <input type="range" id="rotationSpeedY" min="-0.02" max="0.02" step="0.001" value="0">
+        左右を軸にして回転
+        <input type="range" id="rotationSpeedZ" min="-0.02" max="0.02" step="0.001" value="0">
+      </p>
+    </div>
+    <div>
+      <p id="recordStatus">---</p>
     </div>
     <div>
       <button id="recordButton">録音</button>
-      <button id="recordStopButton">録音停止</button>
-      <button id="playGeometryButton">図形を保持して再生</button>
-      <button id="playMusicButton">音楽を保持して再生</button>
-      <button id="playRepeatButton">図形を保持して連続再生</button>
-      <button id="playStopButton">再生停止</button>
-
+      <button id="recordStopButton" disabled="true">録音停止</button>
+      <button id="playGeometryButton" disabled="true">図形を保持して再生</button>
+      <button id="playMusicButton" disabled="true">音楽を保持して再生</button>
+      <button id="playStopButton" disabled="true">再生停止</button>
     </div>
     <div>
       <form id="golden">
         <label>
-          <input type="radio" name="golden" value="triangle">golden triangle
+          <input type="radio" name="golden" value="triangle" checked="checked">golden triangle
         </label>
         <label>
           <input type="radio" name="golden" value="gnomon">golden gnomon
@@ -41,7 +48,7 @@
     <div>
       <form id="type">
         <label>
-          <input type="radio" name="type" value="1">type 1
+          <input type="radio" name="type" value="1" checked="checked">type 1
         </label>
         <label>
           <input type="radio" name="type" value="2">type 2

@@ -2,7 +2,7 @@ function distribution(keyboard, n) {
   let color = { r: 0, g: 0, b: 0 };
   // midiキーボードは21-108まで
   for (i = 12 + n; i < 109; i = i + 12) {
-    let v = keyboard[i].velocity / 64;
+    let v = keyboard[i].velocity / 48;
     if (keyboard[i].event === 144) {
       switch (Math.floor(i / 12)) {
         case 2:

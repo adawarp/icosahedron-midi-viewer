@@ -1,4 +1,5 @@
 let endRotation = { x: 0, y: 0, z: 0 };
+let toggleShowNoteNames = true;
 
 function three() {
   const width = 960;
@@ -11,7 +12,7 @@ function three() {
 
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(45, width / height);
-  camera.position.set(100, 0, 0);
+  camera.position.set(80, 5, 5);
   camera.lookAt(new THREE.Vector3(0, 0, 0));
 
   const meshFloor = new THREE.Mesh(
@@ -21,9 +22,9 @@ function three() {
   meshFloor.position.set(0, -24, 0);
   scene.add(meshFloor);
 
-  const light1 = new THREE.PointLight(0xffffff, 1, 100, 1);
-  const light2 = new THREE.PointLight(0xffffff, 1, 100, 1);
-  const light3 = new THREE.PointLight(0xffffff, 1, 100, 1);
+  const light1 = new THREE.PointLight(0xffffff, 1, 150, 1);
+  const light2 = new THREE.PointLight(0xffffff, 1, 150, 1);
+  const light3 = new THREE.PointLight(0xffffff, 1, 150, 1);
   light1.position.set(0, 50, 0);
   light2.position.set(50, 0, 0);
   light3.position.set(0, 50, 50);
@@ -112,26 +113,41 @@ function three() {
   lineGroup.rotation.z = endRotation.z;
   scene.add(lineGroup);
 
-  //文字出力のためのテストだが、現状CORS policyに弾かれる
-  // const loader = new THREE.FontLoader();
-  // loader.load( 'fonts/helvetiker_regular.typeface.json', function ( font ) {
-
-  //   const geometry = new THREE.TextGeometry( 'Hello three.js!', {
-  //     font: font,
-  //     size: 80,
-  //     height: 5,
-  //     curveSegments: 12,
-  //     bevelEnabled: true,
-  //     bevelThickness: 10,
-  //     bevelSize: 8,
-  //     bevelOffset: 0,
-  //     bevelSegments: 5
-  //   });
-  //   const material = new THREE.MeshBasicMaterial({ color: 0xffffff });
-  //   const mesh = new THREE.mesh(geometry, material)
-  //   mesh.position.set(0,0,0)
-  //   scene.add(mesh)
-  // });
+  let noteNames = [
+    'C',
+    'C#',
+    'D',
+    'Eb',
+    'E',
+    'F',
+    'F#',
+    'G',
+    'G#',
+    'A',
+    'Bb',
+    'B',
+  ];
+  const loader = new THREE.FontLoader();
+  loader.load('fonts/helvetiker_regular.typeface.json', function (font) {
+    for (let i = 0; i < 12; i++) {
+      const geometry = new THREE.TextGeometry(noteNames[i], {
+        font: font,
+        size: 2,
+        height: 0.2,
+      });
+      const material = new THREE.MeshLambertMaterial({ color: 0xffffff });
+      const mesh = new THREE.Mesh(geometry, material);
+      mesh.position.set(
+        arrangedVertex[i][0] * 11.3,
+        arrangedVertex[i][1] * 11.3 - 2,
+        arrangedVertex[i][2] * 11.3 + 1
+      );
+      mesh.rotation.z = 0;
+      mesh.rotation.x = 0;
+      mesh.rotation.y = 1.57;
+      vertexGroup.add(mesh);
+    }
+  });
 
   function brightVertex(keys) {
     for (let i = 0; i < 128; i++) {
@@ -147,6 +163,20 @@ function three() {
       } else if (keyboard[128].velocity === 0) {
         lineGroup.children[i].material.opacity = 0;
         lineGroup.children[i].material.transparent = true;
+      }
+    }
+  }
+
+  function showNoteNames(bool) {
+    if (bool && vertexGroup.children[13]) {
+      for (let i = 0; i < 12; i++) {
+        vertexGroup.children[i + 13].material.opacity = 1;
+        vertexGroup.children[i + 13].material.transparent = false;
+      }
+    } else if (vertexGroup.children[13]) {
+      for (let i = 0; i < 12; i++) {
+        vertexGroup.children[i + 13].material.opacity = 0;
+        vertexGroup.children[i + 13].material.transparent = true;
       }
     }
   }
@@ -167,10 +197,23 @@ function three() {
   rotationSpeedRangeZ.addEventListener('change', () => {
     rotationSpeed.z = parseFloat(rotationSpeedRangeZ.value);
   });
+  const stopRotationButton = document.getElementById('stopRotationButton');
+  stopRotationButton.addEventListener('click', () => {
+    rotationSpeedRangeX.value = 0;
+    rotationSpeedRangeY.value = 0;
+    rotationSpeedRangeZ.value = 0;
+    rotationSpeed = { x: 0, y: 0, z: 0 };
+  });
+  const noteNamesCheckBox = document.getElementById('noteNamesCheckBox');
+  noteNamesCheckBox.addEventListener('click', () => {
+    toggleShowNoteNames = noteNamesCheckBox.checked;
+  });
+
   tick();
   function tick() {
     brightVertex(keyboard);
     brightLine(keyboard);
+    showNoteNames(toggleShowNoteNames);
     renderer.render(scene, camera);
     vertexGroup.rotation.x += rotationSpeed.x;
     lineGroup.rotation.x += rotationSpeed.x;
@@ -178,6 +221,7 @@ function three() {
     lineGroup.rotation.y += rotationSpeed.y;
     vertexGroup.rotation.z += rotationSpeed.z;
     lineGroup.rotation.z += rotationSpeed.z;
+
     requestAnimationFrame(tick);
     endRotation.x = vertexGroup.rotation.x;
     endRotation.y = vertexGroup.rotation.y;

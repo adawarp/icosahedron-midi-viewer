@@ -7,6 +7,9 @@ let recordArrangement = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 let startTime = Date.now();
 let toggleRecording = false;
 let playTimeoutIDList = [];
+let midiInputId = 0;
+let midiOutputId = 0;
+
 function initializeKeyboard() {
   keyboard = [];
   for (let i = 0; i < 128; i++) {
@@ -26,8 +29,16 @@ function successCallback(m) {
   ) {
     inputs.push(input.value);
   }
-  document.getElementById('midiInput').textContent =
-    'midi入力 : ' + inputs[0].name;
+  const midiInputSelect = document.getElementById('midiInputSelect');
+  for (i = 0; i < inputs.length; i++) {
+    let option = document.createElement('option');
+    option.textContent = inputs[i].name;
+    option.id = i;
+    midiInputSelect.appendChild(option);
+  }
+  midiInputSelect.addEventListener('change', () => {
+    midiInputId = midiInputSelect.id;
+  });
 
   let outputIterator = midi.outputs.values();
   for (
@@ -37,15 +48,22 @@ function successCallback(m) {
   ) {
     outputs.push(output.value);
   }
-  document.getElementById('midiOutput').textContent =
-    'midi出力 : ' + outputs[0].name;
+  for (i = 0; i < inputs.length; i++) {
+    let option = document.createElement('option');
+    option.textContent = outputs[i].name;
+    option.id = i;
+    midiOutputSelect.appendChild(option);
+  }
+  midiOutputSelect.addEventListener('change', () => {
+    midiOutputId = midiOutputSelect.id;
+  });
 
   function allNoteOff() {
     for (let i = 0; i < 128; i++) {
-      outputs[0].send([144, i, 0], performance.now());
+      outputs[midiOutputId].send([144, i, 0], performance.now());
     }
-    outputs[0].send([176, 64, 0], performance.now());
-    outputs[0].send([177, 64, 0], performance.now());
+    outputs[midiOutputId].send([176, 64, 0], performance.now());
+    outputs[midiOutputId].send([177, 64, 0], performance.now());
   }
   const recordStatus = document.getElementById('recordStatus');
 
@@ -151,7 +169,7 @@ function successCallback(m) {
             playStopButton.disabled = true;
             playTimeoutIDList = [];
           } else {
-            outputs[0].send(note, performance.now());
+            outputs[midiOutputId].send(note, performance.now());
             if (note[0] === 176) {
               keyboard[128].velocity = note[2];
             }
@@ -177,9 +195,7 @@ function successCallback(m) {
     allNoteOff();
   });
 
-  for (let cnt = 0; cnt < inputs.length; cnt++) {
-    inputs[cnt].onmidimessage = onMIDIEvent;
-  }
+  inputs[midiInputId].onmidimessage = onMIDIEvent;
   function onMIDIEvent(e) {
     if (e.data[0] === 128 || e.data[0] === 144) {
       keyboard[e.data[1]].event = e.data[0];

@@ -25,7 +25,7 @@ function three() {
   );
   meshFloor.receiveShadow = true;
   meshFloor.position.set(0, -25, 0);
-  scene.add(meshFloor);
+  // scene.add(meshFloor);
 
   const light1 = new THREE.PointLight(0xffffff, 1, 250, 0);
   const light2 = new THREE.PointLight(0xffffff, 1, 150, 1);
@@ -33,7 +33,7 @@ function three() {
   light1.position.set(0, 50, 0);
   light2.position.set(50, 0, 0);
   light3.position.set(0, 50, 50);
-  light1.castShadow = true;
+  // light1.castShadow = true;
   light1.shadow.mapSize.width = 2048;
   light1.shadow.mapSize.height = 2048;
   // light2.castShadow = true
@@ -42,21 +42,24 @@ function three() {
   scene.add(light2);
   scene.add(light3);
 
-  const icosahedronGeometry = new THREE.IcosahedronGeometry(19);
-  const icosahedronMaterial = new THREE.MeshLambertMaterial({
-    opacity: 0.5,
-    transparent: true,
-    side: THREE.DoubleSide,
-  });
-  const icosahedronMesh = new THREE.Mesh(
-    icosahedronGeometry,
-    icosahedronMaterial
-  );
-  icosahedronMesh.receiveShadow = true;
-  icosahedronMesh.castShadow = true;
-  icosahedronMesh.rotation.set(Math.PI / 2, 0, 0);
-  icosahedronMesh.position.set(0, 0, 0);
-  scene.add(icosahedronMesh);
+  function createIcosahedron(rotate) {
+    const icosahedronGeometry = new THREE.IcosahedronGeometry(19);
+    const icosahedronMaterial = new THREE.MeshPhongMaterial({
+      opacity: 0.3,
+      transparent: true,
+      side: THREE.DoubleSide,
+    });
+    const icosahedronMesh = new THREE.Mesh(
+      icosahedronGeometry,
+      icosahedronMaterial
+    );
+    icosahedronMesh.receiveShadow = true;
+    icosahedronMesh.castShadow = true;
+    icosahedronMesh.rotation.set(Math.PI / 2, rotate, 0);
+    icosahedronMesh.position.set(0, 0, 0);
+    scene.add(icosahedronMesh);
+    vertexGroup.add(icosahedronMesh);
+  }
 
   const vertexIcosahedron = [
     [0, 1.618, 1],
@@ -93,8 +96,10 @@ function three() {
   vertexGroup.rotation.x = endRotation.x;
   vertexGroup.rotation.y = endRotation.y;
   vertexGroup.rotation.z = endRotation.z;
-  vertexGroup.add(icosahedronMesh);
   scene.add(vertexGroup);
+
+  createIcosahedron(0);
+  createIcosahedron(Math.PI);
 
   const lineGroup = new THREE.Group();
   for (let i = 0; i < 12; i++) {
@@ -181,15 +186,15 @@ function three() {
   }
 
   function showNoteNames(bool) {
-    if (bool && vertexGroup.children[13]) {
+    if (bool && vertexGroup.children[14]) {
       for (let i = 0; i < 12; i++) {
-        vertexGroup.children[i + 13].material.opacity = 1;
-        vertexGroup.children[i + 13].material.transparent = false;
+        vertexGroup.children[i + 14].material.opacity = 1;
+        vertexGroup.children[i + 14].material.transparent = false;
       }
-    } else if (vertexGroup.children[13]) {
+    } else if (vertexGroup.children[14]) {
       for (let i = 0; i < 12; i++) {
-        vertexGroup.children[i + 13].material.opacity = 0;
-        vertexGroup.children[i + 13].material.transparent = true;
+        vertexGroup.children[i + 14].material.opacity = 0;
+        vertexGroup.children[i + 14].material.transparent = true;
       }
     }
   }

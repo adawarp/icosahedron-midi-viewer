@@ -5,7 +5,7 @@ let arrangement = [0, 1, 5, 4, 9, 8, 11, 10, 6, 7, 2, 3];
 
 golden.addEventListener('change', () => {
   goldenType.golden = goldenForm.golden.value;
-  goldenType.type = goldenForm.type.value;
+  goldenType.type = typeForm.type.value;
   arrange(goldenType.golden, goldenType.type);
   three();
 });

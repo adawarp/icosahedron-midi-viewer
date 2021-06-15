@@ -8,6 +8,7 @@ function three() {
     canvas: document.querySelector('#myCanvas'),
   });
   renderer.setPixelRatio(window.devicePixelRatio);
+  renderer.shadowMap.enabled = true;
   renderer.setSize(width, height);
 
   const scene = new THREE.Scene();
@@ -17,17 +18,26 @@ function three() {
 
   const meshFloor = new THREE.Mesh(
     new THREE.BoxGeometry(2000, 0.1, 2000),
-    new THREE.MeshStandardMaterial({ color: 0x808080, roughness: 0.0 })
+    new THREE.MeshStandardMaterial({
+      color: 0x808080,
+      roughness: 0.0,
+    })
   );
-  meshFloor.position.set(0, -24, 0);
+  meshFloor.receiveShadow = true;
+  meshFloor.position.set(0, -25, 0);
   scene.add(meshFloor);
 
-  const light1 = new THREE.PointLight(0xffffff, 1, 150, 1);
+  const light1 = new THREE.PointLight(0xffffff, 1, 250, 0);
   const light2 = new THREE.PointLight(0xffffff, 1, 150, 1);
   const light3 = new THREE.PointLight(0xffffff, 1, 150, 1);
   light1.position.set(0, 50, 0);
   light2.position.set(50, 0, 0);
   light3.position.set(0, 50, 50);
+  light1.castShadow = true;
+  light1.shadow.mapSize.width = 2048;
+  light1.shadow.mapSize.height = 2048;
+  // light2.castShadow = true
+  // light3.castShadow = true
   scene.add(light1);
   scene.add(light2);
   scene.add(light3);
@@ -36,11 +46,14 @@ function three() {
   const icosahedronMaterial = new THREE.MeshLambertMaterial({
     opacity: 0.5,
     transparent: true,
+    side: THREE.DoubleSide,
   });
   const icosahedronMesh = new THREE.Mesh(
     icosahedronGeometry,
     icosahedronMaterial
   );
+  icosahedronMesh.receiveShadow = true;
+  icosahedronMesh.castShadow = true;
   icosahedronMesh.rotation.set(Math.PI / 2, 0, 0);
   icosahedronMesh.position.set(0, 0, 0);
   scene.add(icosahedronMesh);

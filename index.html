@@ -2,6 +2,7 @@
 <html>
   <head>
     <title>Icosahedron MIDI Viewer</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
     <script src="./js/distribution.js"></script>
     <script src="./js/midi.js"></script>
     <script src="./js/scene.js"></script>
@@ -9,24 +10,27 @@
     <script src="./js/three.min.js"></script>
   </head>
   <body>
-    <h1>Icosahedron MIDI Viewer</h1>
-    <p>midi入力:
-      <select id="midiInputSelect">
-      </select>
-    </p>
-    <p>midi出力:
-      <select id="midiOutputSelect">
-      </select>
-    </p>
+    <div id="header">
+      <h1>Icosahedron MIDI Viewer</h1>
+      <p>midi入力:
+        <select id="midiInputSelect">
+        </select>
+      </p>
+      <p>midi出力:
+        <select id="midiOutputSelect">
+        </select>
+      </p>
+    </div>
     <canvas id="myCanvas"></canvas>
-    <div>
+    <div id="footer">
+      <div>
       <p>前後を軸にして回転
         <input type="range" id="rotationSpeedX" min="-0.02" max="0.02" step="0.001" value="0.005">
         高低を軸にして回転
         <input type="range" id="rotationSpeedY" min="-0.02" max="0.02" step="0.001" value="0">
         左右を軸にして回転
         <input type="range" id="rotationSpeedZ" min="-0.02" max="0.02" step="0.001" value="0">
-        <button id="stopRotationButton">回転を停止</button>
+        <button id="rotationButton">回転を停止</button>
         音名を表示
         <input type="checkbox" id="noteNamesCheckBox" checked>
       </p>
@@ -35,22 +39,22 @@
       <p id="recordStatus">---</p>
     </div>
     <div>
-      <button id="recordButton">録音</button>
-      <button id="recordStopButton" disabled="true">録音停止</button>
-      <button id="playGeometryButton" disabled="true">図形を保持して再生</button>
-      <button id="playMusicButton" disabled="true">音楽を保持して再生</button>
-      <button id="playStopButton" disabled="true">再生停止</button>
+      <button id="recordButton">録音(R)</button>
+      <button id="recordStopButton" disabled="true">録音停止(T)</button>
+      <button id="playGeometryButton" disabled="true">図形を保持して再生(S)</button>
+      <button id="playMusicButton" disabled="true">音楽を保持して再生(D)</button>
+      <button id="playStopButton" disabled="true">再生停止(Space)</button>
     </div>
     <div>
       <form id="golden">
         <label>
-          <input type="radio" name="golden" value="triangle" checked="checked">golden triangle
+          <input type="radio" name="golden" value="triangle" checked="checked">golden triangle (A)
         </label>
         <label>
-          <input type="radio" name="golden" value="gnomon">golden gnomon
+          <input type="radio" name="golden" value="gnomon">golden gnomon (B)
         </label>
         <label>
-          <input type="radio" name="golden" value="rectangle">rectangle
+          <input type="radio" name="golden" value="rectangle">rectangle (C)
         </label>
       </form>
     </div>
@@ -70,10 +74,21 @@
         </label>
       </form>
     </div>
+    <div>
+      <p>Fキーで全画面表示・Escapeキーで通常表示になります。</p>
+      <p>全画面状態では、ボタン類が全て非表示となりますので、キーボード操作で録音・再生などを行ってください。</p>
+    </div>
     <p>Musical Icosahedron by Imai, Dellby, and Tanaka</p>
     <p><a href="https://arxiv.org/abs/2103.10272">https://arxiv.org/abs/2103.10272</a></p>
     <p><a href="https://note.com/imaiyusuke1993">https://note.com/imaiyusuke1993</a></p>
+  </div>
   </body>
   <script src="./js/arrangement.js"></script>
+  <style>
+    body {
+      margin: 0;
+      /* overflow: hidden; */
+    }
+  </style>
   </html>
   

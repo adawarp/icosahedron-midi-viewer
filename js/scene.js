@@ -1,31 +1,62 @@
 let endRotation = { x: 0, y: 0, z: 0 };
 let toggleShowNoteNames = true;
+let rotationToggle = true;
+let width = 960;
+let height = 540;
 
 function three() {
-  const width = 960;
-  const height = 540;
+  header = document.getElementById('header');
+  footer = document.getElementById('footer');
   const renderer = new THREE.WebGLRenderer({
     canvas: document.querySelector('#myCanvas'),
   });
-  renderer.setPixelRatio(window.devicePixelRatio);
-  renderer.shadowMap.enabled = true;
-  renderer.setSize(width, height);
 
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(45, width / height);
   camera.position.set(80, 5, 5);
   camera.lookAt(new THREE.Vector3(0, 0, 0));
 
-  const meshFloor = new THREE.Mesh(
-    new THREE.BoxGeometry(2000, 0.1, 2000),
-    new THREE.MeshStandardMaterial({
-      color: 0x808080,
-      roughness: 0.0,
-    })
-  );
-  meshFloor.receiveShadow = true;
-  meshFloor.position.set(0, -25, 0);
-  // scene.add(meshFloor);
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'f') {
+      document.body.requestFullscreen();
+    }
+  });
+  onResize();
+
+  window.addEventListener('resize', () => {
+    if (window.document.fullscreenElement) {
+      width = window.innerWidth;
+      height = window.innerHeight;
+      header.style.display = 'none';
+      footer.style.display = 'none';
+    } else {
+      width = 960;
+      height = 540;
+      header.style.display = '';
+      footer.style.display = '';
+    }
+    onResize();
+  });
+
+  function onResize() {
+    renderer.setPixelRatio(window.devicePixelRatio);
+    renderer.setSize(width, height);
+    renderer.shadowMap.enabled = true;
+
+    camera.aspect = width / height;
+    camera.updateProjectionMatrix();
+  }
+
+  // const meshFloor = new THREE.Mesh(
+  //   new THREE.BoxGeometry(2000, 0.1, 2000),
+  //   new THREE.MeshStandardMaterial({
+  //     color: 0x808080,
+  //     roughness: 0.0,
+  //   })
+  // );
+  // meshFloor.receiveShadow = true;
+  // meshFloor.position.set(0, -25, 0);
+  // // scene.add(meshFloor);
 
   const light1 = new THREE.PointLight(0xffffff, 1, 250, 0);
   const light2 = new THREE.PointLight(0xffffff, 1, 150, 1);
@@ -33,11 +64,8 @@ function three() {
   light1.position.set(0, 50, 0);
   light2.position.set(50, 0, 0);
   light3.position.set(0, 50, 50);
-  // light1.castShadow = true;
   light1.shadow.mapSize.width = 2048;
   light1.shadow.mapSize.height = 2048;
-  // light2.castShadow = true
-  // light3.castShadow = true
   scene.add(light1);
   scene.add(light2);
   scene.add(light3);
@@ -215,8 +243,8 @@ function three() {
   rotationSpeedRangeZ.addEventListener('change', () => {
     rotationSpeed.z = parseFloat(rotationSpeedRangeZ.value);
   });
-  const stopRotationButton = document.getElementById('stopRotationButton');
-  stopRotationButton.addEventListener('click', () => {
+  const rotationButton = document.getElementById('rotationButton');
+  rotationButton.addEventListener('click', () => {
     rotationSpeedRangeX.value = 0;
     rotationSpeedRangeY.value = 0;
     rotationSpeedRangeZ.value = 0;

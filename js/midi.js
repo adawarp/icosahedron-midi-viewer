@@ -88,6 +88,7 @@ function successCallback(m) {
       case 'recording':
         if (e.key === 'r') record();
         if (e.key === 't') recordStop();
+        if (e.key === ' ') recordStop();
         break;
       case 'recorded':
         if (e.key === 'r') record();
@@ -95,10 +96,10 @@ function successCallback(m) {
         if (e.key === 'd') playMusic();
         break;
       case 'playingGeometry':
-        if (e.key === 'Space') playStop();
+        if (e.key === ' ') playStop();
         break;
       case 'playingMusic':
-        if (e.key === 'SpaceBar') playStop();
+        if (e.key === ' ') playStop();
         break;
     }
   });

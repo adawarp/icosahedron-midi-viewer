@@ -7,6 +7,10 @@ let recordArrangement = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 let startTime = Date.now();
 let toggleRecording = false;
 let playTimeoutIDList = [];
+let midiInputId = 0;
+let midiOutputId = 0;
+let recordingStatus = 'noRecording';
+
 function initializeKeyboard() {
   keyboard = [];
   for (let i = 0; i < 128; i++) {
@@ -26,8 +30,16 @@ function successCallback(m) {
   ) {
     inputs.push(input.value);
   }
-  document.getElementById('midiInput').textContent =
-    'midi入力 : ' + inputs[0].name;
+  const midiInputSelect = document.getElementById('midiInputSelect');
+  for (i = 0; i < inputs.length; i++) {
+    let option = document.createElement('option');
+    option.textContent = inputs[i].name;
+    option.id = i;
+    midiInputSelect.appendChild(option);
+  }
+  midiInputSelect.addEventListener('change', () => {
+    midiInputId = midiInputSelect.id;
+  });
 
   let outputIterator = midi.outputs.values();
   for (
@@ -37,15 +49,22 @@ function successCallback(m) {
   ) {
     outputs.push(output.value);
   }
-  document.getElementById('midiOutput').textContent =
-    'midi出力 : ' + outputs[0].name;
+  for (i = 0; i < inputs.length; i++) {
+    let option = document.createElement('option');
+    option.textContent = outputs[i].name;
+    option.id = i;
+    midiOutputSelect.appendChild(option);
+  }
+  midiOutputSelect.addEventListener('change', () => {
+    midiOutputId = midiOutputSelect.id;
+  });
 
   function allNoteOff() {
     for (let i = 0; i < 128; i++) {
-      outputs[0].send([144, i, 0], performance.now());
+      outputs[midiOutputId].send([144, i, 0], performance.now());
     }
-    outputs[0].send([176, 64, 0], performance.now());
-    outputs[0].send([177, 64, 0], performance.now());
+    outputs[midiOutputId].send([176, 64, 0], performance.now());
+    outputs[midiOutputId].send([177, 64, 0], performance.now());
   }
   const recordStatus = document.getElementById('recordStatus');
 
@@ -55,16 +74,37 @@ function successCallback(m) {
   const playMusicButton = document.getElementById('playMusicButton');
   const playStopButton = document.getElementById('playStopButton');
 
-  recordButton.addEventListener('click', () => {
-    recordStatus.textContent = '録音中';
-    recordStopButton.disabled = false;
-    toggleRecording = true;
-    recordArrangement = arrangement;
-    midiHistory = [];
-    startTime = Date.now();
+  recordButton.addEventListener('click', record);
+  recordStopButton.addEventListener('click', recordStop);
+  playGeometryButton.addEventListener('click', playGeometry);
+  playMusicButton.addEventListener('click', playMusic);
+  playStopButton.addEventListener('click', playStop);
+
+  document.addEventListener('keydown', (e) => {
+    switch (recordingStatus) {
+      case 'noRecording':
+        if (e.key === 'r') record();
+        break;
+      case 'recording':
+        if (e.key === 'r') record();
+        if (e.key === 't') recordStop();
+        break;
+      case 'recorded':
+        if (e.key === 'r') record();
+        if (e.key === 's') playGeometry();
+        if (e.key === 'd') playMusic();
+        break;
+      case 'playingGeometry':
+        if (e.key === 'Space') playStop();
+        break;
+      case 'playingMusic':
+        if (e.key === 'SpaceBar') playStop();
+        break;
+    }
   });
 
-  recordStopButton.addEventListener('click', () => {
+  function recordStop() {
+    recordingStatus = 'recorded';
     playGeometryButton.disabled = false;
     playMusicButton.disabled = false;
     recordStopButton.disabled = true;
@@ -72,9 +112,20 @@ function successCallback(m) {
     midiHistory.push([Date.now(), [0, 0, 0]]);
     recordStatus.textContent =
       (midiHistory[midiHistory.length - 1][0] - startTime) / 1000 + '秒録音済';
-  });
+  }
 
-  playGeometryButton.addEventListener('click', () => {
+  function record() {
+    recordingStatus = 'recording';
+    recordStatus.textContent = '録音中';
+    recordStopButton.disabled = false;
+    toggleRecording = true;
+    recordArrangement = arrangement;
+    midiHistory = [];
+    startTime = Date.now();
+  }
+
+  function playGeometry() {
+    recordingStatus = 'playingGeometry';
     recordStatus.textContent = '図形を保持して再生中';
     recordButton.disabled = true;
     recordStopButton.disabled = true;
@@ -103,6 +154,7 @@ function successCallback(m) {
       playTimeoutIDList.push(
         setTimeout(() => {
           if (note[0] === 0) {
+            recordingStatus = 'recorded';
             recordStatus.textContent =
               (midiHistory[midiHistory.length - 1][0] - startTime) / 1000 +
               '秒録音済';
@@ -123,9 +175,10 @@ function successCallback(m) {
         }, midiHistory[i][0] - startTime)
       );
     }
-  });
+  }
 
-  playMusicButton.addEventListener('click', () => {
+  function playMusic() {
+    recordingStatus = 'playingMusic';
     recordStatus.textContent = '音楽を保持して再生中';
     recordButton.disabled = true;
     recordStopButton.disabled = true;
@@ -141,6 +194,7 @@ function successCallback(m) {
       playTimeoutIDList.push(
         setTimeout(() => {
           if (note[0] === 0) {
+            recordingStatus = 'recorded';
             recordStatus.textContent =
               (midiHistory[midiHistory.length - 1][0] - startTime) / 1000 +
               '秒録音済';
@@ -151,7 +205,7 @@ function successCallback(m) {
             playStopButton.disabled = true;
             playTimeoutIDList = [];
           } else {
-            outputs[0].send(note, performance.now());
+            outputs[midiOutputId].send(note, performance.now());
             if (note[0] === 176) {
               keyboard[128].velocity = note[2];
             }
@@ -161,9 +215,10 @@ function successCallback(m) {
         }, midiHistory[i][0] - startTime)
       );
     }
-  });
+  }
 
-  playStopButton.addEventListener('click', () => {
+  function playStop() {
+    recordingStatus = 'recorded';
     recordStatus.textContent =
       (midiHistory[midiHistory.length - 1][0] - startTime) / 1000 + '秒録音済';
     recordButton.disabled = false;
@@ -175,11 +230,9 @@ function successCallback(m) {
     playTimeoutIDList = [];
     initializeKeyboard();
     allNoteOff();
-  });
-
-  for (let cnt = 0; cnt < inputs.length; cnt++) {
-    inputs[cnt].onmidimessage = onMIDIEvent;
   }
+
+  inputs[midiInputId].onmidimessage = onMIDIEvent;
   function onMIDIEvent(e) {
     if (e.data[0] === 128 || e.data[0] === 144) {
       keyboard[e.data[1]].event = e.data[0];

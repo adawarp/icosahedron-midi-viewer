@@ -1,11 +1,11 @@
 let goldenForm = document.getElementById('golden');
 let typeForm = document.getElementById('type');
-let goldenType = { golden: 0, type: 0 };
+let goldenType = { golden: 'triangle', type: '1' };
 let arrangement = [0, 1, 5, 4, 9, 8, 11, 10, 6, 7, 2, 3];
 
 golden.addEventListener('change', () => {
   goldenType.golden = goldenForm.golden.value;
-  goldenType.type = goldenForm.type.value;
+  goldenType.type = typeForm.type.value;
   arrange(goldenType.golden, goldenType.type);
   three();
 });
@@ -14,6 +14,30 @@ type.addEventListener('change', () => {
   goldenType.type = typeForm.type.value;
   arrange(goldenType.golden, goldenType.type);
   three();
+});
+
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'a') {
+    goldenType.golden = 'triangle';
+    goldenForm.golden.value = 'triangle';
+    arrange(goldenType.golden, goldenType.type);
+    three();
+  } else if (e.key === 'b') {
+    goldenType.golden = 'gnomon';
+    goldenForm.golden.value = 'gnomon';
+    arrange(goldenType.golden, goldenType.type);
+    three();
+  } else if (e.key === 'c') {
+    goldenType.golden = 'rectangle';
+    goldenForm.golden.value = 'rectangle';
+    arrange(goldenType.golden, goldenType.type);
+    three();
+  } else if (e.key === '1' || e.key === '2' || e.key === '3' || e.key === '4') {
+    goldenType.type = e.key;
+    typeForm.type.value = e.key;
+    arrange(goldenType.golden, goldenType.type);
+    three();
+  }
 });
 
 function arrange(golden, type) {

@@ -1,49 +1,93 @@
 let endRotation = { x: 0, y: 0, z: 0 };
 let toggleShowNoteNames = true;
+let rotationToggle = true;
+let width = 960;
+let height = 540;
 
 function three() {
-  const width = 960;
-  const height = 540;
+  header = document.getElementById('header');
+  footer = document.getElementById('footer');
   const renderer = new THREE.WebGLRenderer({
     canvas: document.querySelector('#myCanvas'),
   });
-  renderer.setPixelRatio(window.devicePixelRatio);
-  renderer.setSize(width, height);
 
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(45, width / height);
   camera.position.set(80, 5, 5);
   camera.lookAt(new THREE.Vector3(0, 0, 0));
 
-  const meshFloor = new THREE.Mesh(
-    new THREE.BoxGeometry(2000, 0.1, 2000),
-    new THREE.MeshStandardMaterial({ color: 0x808080, roughness: 0.0 })
-  );
-  meshFloor.position.set(0, -24, 0);
-  scene.add(meshFloor);
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'f') {
+      document.body.requestFullscreen();
+    }
+  });
+  onResize();
 
-  const light1 = new THREE.PointLight(0xffffff, 1, 150, 1);
+  window.addEventListener('resize', () => {
+    if (window.document.fullscreenElement) {
+      width = window.innerWidth;
+      height = window.innerHeight;
+      header.style.display = 'none';
+      footer.style.display = 'none';
+    } else {
+      width = 960;
+      height = 540;
+      header.style.display = '';
+      footer.style.display = '';
+    }
+    onResize();
+  });
+
+  function onResize() {
+    renderer.setPixelRatio(window.devicePixelRatio);
+    renderer.setSize(width, height);
+    renderer.shadowMap.enabled = true;
+
+    camera.aspect = width / height;
+    camera.updateProjectionMatrix();
+  }
+
+  // const meshFloor = new THREE.Mesh(
+  //   new THREE.BoxGeometry(2000, 0.1, 2000),
+  //   new THREE.MeshStandardMaterial({
+  //     color: 0x808080,
+  //     roughness: 0.0,
+  //   })
+  // );
+  // meshFloor.receiveShadow = true;
+  // meshFloor.position.set(0, -25, 0);
+  // // scene.add(meshFloor);
+
+  const light1 = new THREE.PointLight(0xffffff, 1, 250, 0);
   const light2 = new THREE.PointLight(0xffffff, 1, 150, 1);
   const light3 = new THREE.PointLight(0xffffff, 1, 150, 1);
   light1.position.set(0, 50, 0);
   light2.position.set(50, 0, 0);
   light3.position.set(0, 50, 50);
+  light1.shadow.mapSize.width = 2048;
+  light1.shadow.mapSize.height = 2048;
   scene.add(light1);
   scene.add(light2);
   scene.add(light3);
 
-  const icosahedronGeometry = new THREE.IcosahedronGeometry(19);
-  const icosahedronMaterial = new THREE.MeshLambertMaterial({
-    opacity: 0.5,
-    transparent: true,
-  });
-  const icosahedronMesh = new THREE.Mesh(
-    icosahedronGeometry,
-    icosahedronMaterial
-  );
-  icosahedronMesh.rotation.set(Math.PI / 2, 0, 0);
-  icosahedronMesh.position.set(0, 0, 0);
-  scene.add(icosahedronMesh);
+  function createIcosahedron(rotate) {
+    const icosahedronGeometry = new THREE.IcosahedronGeometry(19);
+    const icosahedronMaterial = new THREE.MeshPhongMaterial({
+      opacity: 0.3,
+      transparent: true,
+      side: THREE.DoubleSide,
+    });
+    const icosahedronMesh = new THREE.Mesh(
+      icosahedronGeometry,
+      icosahedronMaterial
+    );
+    icosahedronMesh.receiveShadow = true;
+    icosahedronMesh.castShadow = true;
+    icosahedronMesh.rotation.set(Math.PI / 2, rotate, 0);
+    icosahedronMesh.position.set(0, 0, 0);
+    scene.add(icosahedronMesh);
+    vertexGroup.add(icosahedronMesh);
+  }
 
   const vertexIcosahedron = [
     [0, 1.618, 1],
@@ -80,8 +124,10 @@ function three() {
   vertexGroup.rotation.x = endRotation.x;
   vertexGroup.rotation.y = endRotation.y;
   vertexGroup.rotation.z = endRotation.z;
-  vertexGroup.add(icosahedronMesh);
   scene.add(vertexGroup);
+
+  createIcosahedron(0);
+  createIcosahedron(Math.PI);
 
   const lineGroup = new THREE.Group();
   for (let i = 0; i < 12; i++) {
@@ -168,15 +214,15 @@ function three() {
   }
 
   function showNoteNames(bool) {
-    if (bool && vertexGroup.children[13]) {
+    if (bool && vertexGroup.children[14]) {
       for (let i = 0; i < 12; i++) {
-        vertexGroup.children[i + 13].material.opacity = 1;
-        vertexGroup.children[i + 13].material.transparent = false;
+        vertexGroup.children[i + 14].material.opacity = 1;
+        vertexGroup.children[i + 14].material.transparent = false;
       }
-    } else if (vertexGroup.children[13]) {
+    } else if (vertexGroup.children[14]) {
       for (let i = 0; i < 12; i++) {
-        vertexGroup.children[i + 13].material.opacity = 0;
-        vertexGroup.children[i + 13].material.transparent = true;
+        vertexGroup.children[i + 14].material.opacity = 0;
+        vertexGroup.children[i + 14].material.transparent = true;
       }
     }
   }
@@ -197,8 +243,8 @@ function three() {
   rotationSpeedRangeZ.addEventListener('change', () => {
     rotationSpeed.z = parseFloat(rotationSpeedRangeZ.value);
   });
-  const stopRotationButton = document.getElementById('stopRotationButton');
-  stopRotationButton.addEventListener('click', () => {
+  const rotationButton = document.getElementById('rotationButton');
+  rotationButton.addEventListener('click', () => {
     rotationSpeedRangeX.value = 0;
     rotationSpeedRangeY.value = 0;
     rotationSpeedRangeZ.value = 0;

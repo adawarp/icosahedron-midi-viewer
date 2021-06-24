@@ -10,6 +10,7 @@ let playTimeoutIDList = [];
 let midiInputId = 0;
 let midiOutputId = 0;
 let recordingStatus = 'noRecording';
+let reader = new FileReader();
 
 function initializeKeyboard() {
   keyboard = [];
@@ -73,12 +74,16 @@ function successCallback(m) {
   const playGeometryButton = document.getElementById('playGeometryButton');
   const playMusicButton = document.getElementById('playMusicButton');
   const playStopButton = document.getElementById('playStopButton');
+  const downloadButton = document.getElementById('downloadButton');
+  const chooseFile = document.getElementById('chooseFile');
 
   recordButton.addEventListener('click', record);
   recordStopButton.addEventListener('click', recordStop);
   playGeometryButton.addEventListener('click', playGeometry);
   playMusicButton.addEventListener('click', playMusic);
   playStopButton.addEventListener('click', playStop);
+  downloadButton.addEventListener('click', download);
+  chooseFile.addEventListener('change', upload);
 
   document.addEventListener('keydown', (e) => {
     switch (recordingStatus) {
@@ -110,6 +115,7 @@ function successCallback(m) {
     playMusicButton.disabled = false;
     recordStopButton.disabled = true;
     toggleRecording = false;
+    downloadButton.disabled = false;
     midiHistory.push([Date.now(), [0, 0, 0]]);
     recordStatus.textContent =
       (midiHistory[midiHistory.length - 1][0] - startTime) / 1000 + '秒録音済';
@@ -119,6 +125,7 @@ function successCallback(m) {
     recordingStatus = 'recording';
     recordStatus.textContent = '録音中';
     recordStopButton.disabled = false;
+    downloadButton.disabled = true;
     toggleRecording = true;
     recordArrangement = arrangement;
     midiHistory = [];
@@ -133,6 +140,7 @@ function successCallback(m) {
     playGeometryButton.disabled = true;
     playMusicButton.disabled = true;
     playStopButton.disabled = false;
+    downloadButton.disabled = true;
     function transpose(key) {
       const octave = Math.floor(key / 12);
       const noteName = key % 12;
@@ -164,6 +172,7 @@ function successCallback(m) {
             playGeometryButton.disabled = false;
             playMusicButton.disabled = false;
             playStopButton.disabled = true;
+            downloadButton.disabled = false;
             playTimeoutIDList = [];
           } else {
             outputs[0].send(note, performance.now());
@@ -186,6 +195,7 @@ function successCallback(m) {
     playGeometryButton.disabled = true;
     playMusicButton.disabled = true;
     playStopButton.disabled = false;
+    downloadButton.disabled = true;
     for (let i = 0; i < midiHistory.length; i++) {
       let note = [
         midiHistory[i][1][0],
@@ -204,6 +214,7 @@ function successCallback(m) {
             playGeometryButton.disabled = false;
             playMusicButton.disabled = false;
             playStopButton.disabled = true;
+            downloadButton.disabled = false;
             playTimeoutIDList = [];
           } else {
             outputs[midiOutputId].send(note, performance.now());
@@ -227,10 +238,53 @@ function successCallback(m) {
     playGeometryButton.disabled = false;
     playMusicButton.disabled = false;
     playStopButton.disabled = true;
+    downloadButton.disabled = false;
     playTimeoutIDList.forEach((id) => clearTimeout(id));
     playTimeoutIDList = [];
     initializeKeyboard();
     allNoteOff();
+  }
+
+  function download(e) {
+    e.preventDefault();
+    const blob = new Blob(
+      [JSON.stringify([startTime, recordArrangement, midiHistory])],
+      { type: 'text/plain' }
+    );
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    document.body.appendChild(a);
+    a.download = 'icosahedron' + startTime;
+    a.href = url;
+    a.click();
+    a.remove;
+    URL.revokeObjectURL(url);
+  }
+
+  function upload() {
+    recordingStatus = 'recorded';
+    recordButton.disabled = false;
+    recordStopButton.disabled = true;
+    playGeometryButton.disabled = false;
+    playMusicButton.disabled = false;
+    playStopButton.disabled = true;
+    downloadButton.disabled = true;
+
+    let input = document.getElementById('chooseFile').files[0];
+    reader.addEventListener(
+      'load',
+      function () {
+        let data = JSON.parse(reader.result);
+        startTime = data[0];
+        recordArrangement = data[1];
+        midiHistory = data[2];
+        recordStatus.textContent =
+          (midiHistory[midiHistory.length - 1][0] - startTime) / 1000 +
+          '秒録音済';
+      },
+      true
+    );
+    reader.readAsText(input);
   }
 
   inputs[midiInputId].onmidimessage = onMIDIEvent;

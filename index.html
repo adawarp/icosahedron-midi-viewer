@@ -40,10 +40,15 @@
     </div>
     <div>
       <button id="recordButton">録音(R)</button>
-      <button id="recordStopButton" disabled="true">録音停止(T)</button>
-      <button id="playGeometryButton" disabled="true">図形を保持して再生(S)</button>
-      <button id="playMusicButton" disabled="true">音楽を保持して再生(D)</button>
-      <button id="playStopButton" disabled="true">再生停止(Space)</button>
+      <button id="recordStopButton" disabled>録音停止(T)</button>
+      <button id="playGeometryButton" disabled>図形を保持して再生(S)</button>
+      <button id="playMusicButton" disabled>音楽を保持して再生(D)</button>
+      <button id="playStopButton" disabled>再生停止(Space)</button>
+      <button id="downloadButton" disabled>録音データをダウンロード</button>
+      <p>
+        録音データを読み込む
+        <input id="chooseFile" type="file" accept=".txt" required>
+      </p>
     </div>
     <div>
       <form id="golden">

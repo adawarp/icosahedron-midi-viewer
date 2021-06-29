@@ -1,7 +1,9 @@
 let goldenForm = document.getElementById('golden');
 let typeForm = document.getElementById('type');
 let goldenType = { golden: 'triangle', type: '1' };
+let rotationNote = document.getElementById('rotationNote');
 let arrangement = [0, 1, 5, 4, 9, 8, 11, 10, 6, 7, 2, 3];
+let rotatePosition = 0;
 
 golden.addEventListener('change', () => {
   goldenType.golden = goldenForm.golden.value;
@@ -13,6 +15,11 @@ type.addEventListener('change', () => {
   goldenType.golden = goldenForm.golden.value;
   goldenType.type = typeForm.type.value;
   arrange(goldenType.golden, goldenType.type);
+  three();
+});
+
+rotationNote.addEventListener('change', () => {
+  rotateNote(parseInt(rotationNote.value));
   three();
 });
 
@@ -40,7 +47,27 @@ document.addEventListener('keydown', (e) => {
   }
 });
 
+function rotateNote(n) {
+  let rotateTimes = (5 + n - rotatePosition) % 5;
+  rotatePosition = rotateTimes + (rotatePosition % 5);
+  if (rotateTimes > 0) {
+    function rotateOnce(lastArrangement) {
+      let onceRotatedArrangement = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+      let rotateList = [0, 2, 3, 4, 5, 1, 10, 6, 7, 8, 9, 11];
+      for (let i = 0; i < 12; i++) {
+        onceRotatedArrangement[lastArrangement.indexOf(i)] = rotateList[i];
+      }
+      return onceRotatedArrangement;
+    }
+    for (let i = 0; i < rotateTimes; i++) {
+      arrangement = rotateOnce(arrangement);
+    }
+  }
+}
+
 function arrange(golden, type) {
+  rotationNote.value = '0';
+  rotatePosition = 0;
   if (golden === 'triangle') {
     switch (type) {
       case '1':
